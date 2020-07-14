@@ -129,6 +129,7 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
          .field("Code", c.code.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Campus", c.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Term", c.term.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
+         .field("Name", c.name.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Description", c.description.as_ref().unwrap_or(&"Unavailable".to_owned()), false);
     })
 }
