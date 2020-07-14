@@ -1,1 +1,2 @@
-web: ./target/release/uoft-bot
+worker: ./target/release/uoft-bot
+
