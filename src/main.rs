@@ -4,14 +4,12 @@ use serenity::model::prelude::*;
 use serenity::framework::standard::{
     StandardFramework,
     CommandResult,
-    Args,
     macros::{
         command,
         group
     }
 };
 use serenity::builder::*;
-use serenity::utils::Color as Colour;
 
 use colored::*;
 
@@ -69,16 +67,6 @@ fn main() {
     }
 }
 
-fn fail_embed(ctx: &mut Context, msg: &Message) {
-    
-}
-
-fn set_author(eb: &mut serenity::builder::CreateEmbed) {
-    eb.author(|a| {
-        a.name("bolt#8452")
-    });
-}
-
 #[command]
 fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
     msg.reply(&ctx, "Pong!")?;
@@ -88,12 +76,12 @@ fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 fn echo(ctx: &mut Context, msg: &Message) -> CommandResult {
-    msg.reply(&ctx, msg.content_safe(&ctx).replace("~echo ", ""))?;
+    msg.reply(&ctx, msg.content_safe(&ctx).replace(".echo ", ""))?;
 
     return Ok(());
 }
 
-type NikelFunc<T> = fn(&NikelAPI, &Parameters) -> NikelResult<T>;
+//type NikelFunc<T> = fn(&NikelAPI, &Parameters) -> NikelResult<T>;
 
 fn req<T>(ctx: &Context, msg: &Message, nik: NikelResult<T>, proc: fn(&T, &mut CreateEmbed)) -> CommandResult {
     msg.channel_id.send_message(ctx, |m| {
@@ -130,7 +118,8 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
          .field("Campus", c.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Term", c.term.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Name", c.name.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Description", c.description.as_ref().unwrap_or(&"Unavailable".to_owned()), false);
+         .field("Description", c.description.as_ref().unwrap_or(&"Unavailable".to_owned()), false)
+         .field("UTM Dist. Req.", c.utm_distribution.as_ref().unwrap_or(&"Unavailable".to_owned()), true);
     })
 }
 
@@ -142,7 +131,7 @@ fn textbooks(ctx: &mut Context, msg: &Message) -> CommandResult {
          .field("Title", t.title.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Price", format!("${}", t.price.as_ref().unwrap_or(&-1.0)), true)
          .field("ISBN", t.isbn.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Courses", t.courses.iter().map(|c| c.code.as_ref().unwrap_or(&"?".to_owned()).to_owned()).collect::<Vec<_>>().join("\n"), false);
+         .field("Courses", t.courses.iter().map(|c| c.code.as_ref().unwrap_or(&"Unavailable".to_owned()).to_owned()).collect::<Vec<_>>().join("\n"), false);
     })
 }
 
@@ -210,7 +199,7 @@ fn buildings(ctx: &mut Context, msg: &Message) -> CommandResult {
         m.title("Building")
          .field("Name", b.name.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Address", format!("{},{},{}", b.address.street.as_ref().unwrap_or(&"?".to_owned()), b.address.city.as_ref().unwrap_or(&"?".to_owned()), b.address.country.as_ref().unwrap_or(&"?".to_owned())), true)
-         .field("Coordinates", format!("{} degrees North, {} degrees East", b.coordinates.latitude.unwrap_or(0.0), b.coordinates.longitude.unwrap_or(0.0)), true);
+         .field("Coordinates", format!("{} degrees North, {} degrees East", b.coordinates.latitude.as_ref().unwrap_or(&0.0), b.coordinates.longitude.as_ref().unwrap_or(&0.0)), true);
     })
 }
 
