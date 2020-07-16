@@ -115,7 +115,7 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
     req::<Course>(&ctx, msg, client.courses(to_params(&msg.content_safe(&ctx))), |c: &Course, m: &mut CreateEmbed| {
         let title = format!("{}{}", c.code.as_ref().expect("No course code!?"),
             match c.name.as_ref() {
-                Some(name) => format!("- {}", name),
+                Some(name) => format!(" - {}", name),
                 _ => "".to_owned()
             }
         );
