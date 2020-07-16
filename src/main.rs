@@ -122,11 +122,11 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
         m.title(title)
          .field("Campus", c.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Term", c.term.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Description", c.description.as_ref().unwrap_or(&"Unavailable".to_owned()), false)
          .field("UTM Dist. Req.", c.utm_distribution.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Prereqs", c.prerequisites.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Coreqs", c.corequisites.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Exclusions", c.exclusions.as_ref().unwrap_or(&"Unavailable".to_owned()), true);
+         .field("Exclusions", c.exclusions.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
+         .field("Description", c.description.as_ref().unwrap_or(&"Unavailable".to_owned()), false);
     })
 }
 
