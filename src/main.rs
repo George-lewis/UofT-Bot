@@ -134,8 +134,7 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
 fn textbooks(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Textbook>(&ctx, msg, client.textbooks(to_params(&msg.content_safe(&ctx))), |t: &Textbook, m: &mut CreateEmbed| {
-        m.title("Textbook")
-         .field("Title", t.title.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
+        m.title(t.title.as_ref().unwrap_or(&"Textbook".to_owned()))
          .field("Price", format!("${}", t.price.as_ref().unwrap_or(&-1.0)), true)
          .field("ISBN", t.isbn.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Courses", t.courses.iter().map(|c| c.code.as_ref().unwrap_or(&"Unavailable".to_owned()).to_owned()).collect::<Vec<_>>().join("\n"), false);
@@ -170,8 +169,7 @@ fn evals(ctx: &mut Context, msg: &Message) -> CommandResult {
 fn food(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Food>(&ctx, msg, client.food(to_params(&msg.content_safe(&ctx))), |f: &Food, m: &mut CreateEmbed| {
-        m.title("Food")
-         .field("Name", f.name.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
+        m.title(f.name.as_ref().unwrap_or(&"Food".to_owned()))
          .field("Campus", f.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Address", f.address.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Tags", f.tags.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
@@ -203,8 +201,7 @@ fn services(ctx: &mut Context, msg: &Message) -> CommandResult {
 fn buildings(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Building>(&ctx, msg, client.buildings(to_params(&msg.content_safe(&ctx))), |b: &Building, m: &mut CreateEmbed| {
-        m.title("Building")
-         .field("Name", b.name.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
+        m.title(b.name.as_ref().unwrap_or(&"Building".to_owned()))
          .field("Address", format!("{},{},{}", b.address.street.as_ref().unwrap_or(&"?".to_owned()), b.address.city.as_ref().unwrap_or(&"?".to_owned()), b.address.country.as_ref().unwrap_or(&"?".to_owned())), true)
          .field("Coordinates", format!("{} degrees North, {} degrees East", b.coordinates.latitude.as_ref().unwrap_or(&0.0), b.coordinates.longitude.as_ref().unwrap_or(&0.0)), true);
     })
