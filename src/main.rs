@@ -113,11 +113,15 @@ fn req<T>(ctx: &Context, msg: &Message, nik: NikelResult<T>, proc: fn(&T, &mut C
 fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Course>(&ctx, msg, client.courses(to_params(&msg.content_safe(&ctx))), |c: &Course, m: &mut CreateEmbed| {
-        m.title("Course")
-         .field("Code", c.code.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
+        let title = format!("{}{}", c.code.as_ref().expect("No course code!?"),
+            match c.name.as_ref() {
+                Some(name) => format!("- {}", name),
+                _ => "".to_owned()
+            }
+        );
+        m.title(title)
          .field("Campus", c.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Term", c.term.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Name", c.name.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Description", c.description.as_ref().unwrap_or(&"Unavailable".to_owned()), false)
          .field("UTM Dist. Req.", c.utm_distribution.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
          .field("Prereqs", c.prerequisites.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
