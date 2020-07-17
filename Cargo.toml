@@ -7,6 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-nikel-rs = "0.2.0"
+nikel-rs = "0.2.1"
 colored = "1.9"
 serenity = "0.8"
