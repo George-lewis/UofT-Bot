@@ -238,7 +238,7 @@ fn to_params<'a>(input: &'a String, default: &'a String) -> Result<Parameters<'a
         _ => return Err(())
     };
 
-    if !rest.contains(",") {
+    if !rest.contains(":") {
         return Ok(vec![(default, rest)]);
     }
     
