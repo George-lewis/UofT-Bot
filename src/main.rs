@@ -124,6 +124,7 @@ fn req<T: Clone>(ctx: &Context, msg: &Message, f: NikelFunc<T>, default: &str, p
 }
 
 #[command]
+#[aliases("course", "classes", "class")]
 fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
     req::<Course>(&ctx, msg, nikel_rs::courses, "code", |c: Course, m: &mut CreateEmbed| {
         let title = format!("{}{}", c.code.expect("No course code!?"),
@@ -144,6 +145,7 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[aliases("textbook")]
 fn textbooks(ctx: &mut Context, msg: &Message) -> CommandResult {
     req::<Textbook>(&ctx, msg, nikel_rs::textbooks, "title", |t: Textbook, m: &mut CreateEmbed| {
         m.title(t.title.unwrap_or("Textbook".to_owned()))
@@ -154,6 +156,7 @@ fn textbooks(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[aliases("exam")]
 fn exams(ctx: &mut Context, msg: &Message) -> CommandResult {
     req::<Exam>(&ctx, msg, nikel_rs::exams, "course", |e: Exam, m: &mut CreateEmbed| {
         m.title("Exam")
@@ -166,6 +169,7 @@ fn exams(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[aliases("eval")]
 fn evals(ctx: &mut Context, msg: &Message) -> CommandResult {
     req::<Eval>(&ctx, msg, nikel_rs::evals, "name", |e: Eval, m: &mut CreateEmbed| {
         m.title("Eval")
@@ -191,6 +195,7 @@ fn food(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[aliases("service")]
 fn services(ctx: &mut Context, msg: &Message) -> CommandResult {
     req::<Service>(&ctx, msg, nikel_rs::services, "name", |s: Service, m: &mut CreateEmbed| {
         m.title("Service")
@@ -206,6 +211,7 @@ fn services(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[aliases("building")]
 fn buildings(ctx: &mut Context, msg: &Message) -> CommandResult {
     req::<Building>(&ctx, msg, nikel_rs::buildings, "name", |b: Building, m: &mut CreateEmbed| {
         m.title(b.name.unwrap_or("Building".to_owned()))
