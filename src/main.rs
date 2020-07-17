@@ -81,11 +81,25 @@ fn echo(ctx: &mut Context, msg: &Message) -> CommandResult {
     return Ok(());
 }
 
-//type NikelFunc<T> = fn(&NikelAPI, &Parameters) -> NikelResult<T>;
+type NikelFunc<T> = fn(Parameters) -> NikelResult<T>;
 
-fn req<T: Clone>(ctx: &Context, msg: &Message, nik: NikelResult<T>, proc: fn(T, &mut CreateEmbed)) -> CommandResult {
+fn req<T: Clone>(ctx: &Context, msg: &Message, f: NikelFunc<T>, default: &str, proc: fn(T, &mut CreateEmbed)) -> CommandResult {
+    
     msg.channel_id.send_message(ctx, |m| {
-        match nik {
+
+        let content = &msg.content_safe(&ctx);
+        let ddefault = &default.to_owned();
+
+        let params = match to_params(content, ddefault) {
+            Ok(p) => p,
+            _ => {
+                return m.embed(|e: &mut serenity::builder::CreateEmbed| {
+                    e.colour((200, 100, 100)).title("Failed").description("Couldn't parse input")
+                })
+            }
+        };
+
+        match f(params) {
             Ok(resp) => {
                 if resp.response.len() == 0 {
                     m.embed(|e: &mut serenity::builder::CreateEmbed| {
@@ -111,8 +125,7 @@ fn req<T: Clone>(ctx: &Context, msg: &Message, nik: NikelResult<T>, proc: fn(T, 
 
 #[command]
 fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let client = NikelAPI::new();
-    req::<Course>(&ctx, msg, client.courses(to_params(&msg.content_safe(&ctx))), |c: Course, m: &mut CreateEmbed| {
+    req::<Course>(&ctx, msg, nikel_rs::courses, "code", |c: Course, m: &mut CreateEmbed| {
         let title = format!("{}{}", c.code.expect("No course code!?"),
             match c.name {
                 Some(name) => format!(" - {}", name),
@@ -132,8 +145,7 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 fn textbooks(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let client = NikelAPI::new();
-    req::<Textbook>(&ctx, msg, client.textbooks(to_params(&msg.content_safe(&ctx))), |t: Textbook, m: &mut CreateEmbed| {
+    req::<Textbook>(&ctx, msg, nikel_rs::textbooks, "title", |t: Textbook, m: &mut CreateEmbed| {
         m.title(t.title.unwrap_or("Textbook".to_owned()))
          .field("Price", format!("${}", t.price.unwrap_or(-1.0)), true)
          .field("ISBN", t.isbn.unwrap_or("Unavailable".to_owned()), true)
@@ -143,8 +155,7 @@ fn textbooks(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 fn exams(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let client = NikelAPI::new();
-    req::<Exam>(&ctx, msg, client.exams(to_params(&msg.content_safe(&ctx))), |e: Exam, m: &mut CreateEmbed| {
+    req::<Exam>(&ctx, msg, nikel_rs::exams, "course", |e: Exam, m: &mut CreateEmbed| {
         m.title("Exam")
          .field("Course", e.course_code.unwrap_or("Unavailable".to_owned()), true)
          .field("Campus", e.campus.unwrap_or("Unavailable".to_owned()), true)
@@ -156,8 +167,7 @@ fn exams(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 fn evals(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let client = NikelAPI::new();
-    req::<Eval>(&ctx, msg, client.evals(to_params(&msg.content_safe(&ctx))), |e: Eval, m: &mut CreateEmbed| {
+    req::<Eval>(&ctx, msg, nikel_rs::evals, "name", |e: Eval, m: &mut CreateEmbed| {
         m.title("Eval")
          .field("Name", e.name.unwrap_or("Unavailable".to_owned()), true)
          .field("Campus", e.campus.unwrap_or("Unavailable".to_owned()), true)
@@ -167,8 +177,7 @@ fn evals(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 fn food(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let client = NikelAPI::new();
-    req::<Food>(&ctx, msg, client.food(to_params(&msg.content_safe(&ctx))), |f: Food, m: &mut CreateEmbed| {
+    req::<Food>(&ctx, msg, nikel_rs::food, "name", |f: Food, m: &mut CreateEmbed| {
         m.title(f.name.unwrap_or("Food".to_owned()))
          .field("Campus", f.campus.unwrap_or("Unavailable".to_owned()), true)
          .field("Address", f.address.unwrap_or("Unavailable".to_owned()), true)
@@ -183,8 +192,7 @@ fn food(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 fn services(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let client = NikelAPI::new();
-    req::<Service>(&ctx, msg, client.services(to_params(&msg.content_safe(&ctx))), |s: Service, m: &mut CreateEmbed| {
+    req::<Service>(&ctx, msg, nikel_rs::services, "name", |s: Service, m: &mut CreateEmbed| {
         m.title("Service")
          .field("Name", s.name.unwrap_or("Unavailable".to_owned()), true)
          .field("Campus", s.campus.unwrap_or("Unavailable".to_owned()), true)
@@ -199,8 +207,7 @@ fn services(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 fn buildings(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let client = NikelAPI::new();
-    req::<Building>(&ctx, msg, client.buildings(to_params(&msg.content_safe(&ctx))), |b: Building, m: &mut CreateEmbed| {
+    req::<Building>(&ctx, msg, nikel_rs::buildings, "name", |b: Building, m: &mut CreateEmbed| {
         m.title(b.name.unwrap_or("Building".to_owned()))
          .field("Address", format!("{},{},{}", b.address.street.unwrap_or("?".to_owned()), b.address.city.unwrap_or("?".to_owned()), b.address.country.unwrap_or("?".to_owned())), true)
          .field("Coordinates", format!("{} degrees North, {} degrees East", b.coordinates.latitude.unwrap_or(0.0), b.coordinates.longitude.unwrap_or(0.0)), true);
@@ -209,8 +216,7 @@ fn buildings(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 fn parking(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let client = NikelAPI::new();
-    req::<Parking>(&ctx, msg, client.parking(to_params(&msg.content_safe(&ctx))), |p: Parking, m: &mut CreateEmbed| {
+    req::<Parking>(&ctx, msg, nikel_rs::parking, "name", |p: Parking, m: &mut CreateEmbed| {
         m.title("Parking")
          .field("Name", p.name.unwrap_or("Unavailable".to_owned()), true)
          .field("Campus", p.campus.unwrap_or("Unavailable".to_owned()), true)
@@ -219,8 +225,19 @@ fn parking(ctx: &mut Context, msg: &Message) -> CommandResult {
     })
 }
 
-fn to_params(input: &String) -> Parameters {
-    split_once(input, ' ').ok().unwrap().1.split(',')
+fn to_params<'a>(input: &'a String, default: &'a String) -> Result<Parameters<'a>, ()> {
+    
+    let (_, rest) = match split_once(input, ' ') {
+        Ok((a, b)) => (a, b),
+        _ => return Err(())
+    };
+
+    if !rest.contains(",") {
+        return Ok(vec![(default, rest)]);
+    }
+    
+    Ok(
+        rest.split(',')
         .map(|arg| arg.split(":").map(|e| e.trim()).collect())
         .filter(|v: &Vec<&str>| {
             if v.len() != 2 {
@@ -232,6 +249,8 @@ fn to_params(input: &String) -> Parameters {
         })
         .map(|v: Vec<&str>| (v[0], v[1]))
         .collect()
+    )
+
 }
 
 fn split_once(in_string: &str, delim: char) -> Result<(&str, &str), ()> {
