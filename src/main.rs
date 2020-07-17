@@ -113,20 +113,20 @@ fn req<T: Clone>(ctx: &Context, msg: &Message, nik: NikelResult<T>, proc: fn(T, 
 fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Course>(&ctx, msg, client.courses(to_params(&msg.content_safe(&ctx))), |c: Course, m: &mut CreateEmbed| {
-        let title = format!("{}{}", c.code.as_ref().expect("No course code!?"),
-            match c.name.as_ref() {
+        let title = format!("{}{}", c.code.expect("No course code!?"),
+            match c.name {
                 Some(name) => format!(" - {}", name),
                 _ => "".to_owned()
             }
         );
         m.title(title)
-         .field("Campus", c.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Term", c.term.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("UTM Dist. Req.", c.utm_distribution.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Prereqs", c.prerequisites.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Coreqs", c.corequisites.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Exclusions", c.exclusions.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Description", c.description.as_ref().unwrap_or(&"Unavailable".to_owned()), false);
+         .field("Campus", c.campus.unwrap_or("Unavailable".to_owned()), true)
+         .field("Term", c.term.unwrap_or("Unavailable".to_owned()), true)
+         .field("UTM Dist. Req.", c.utm_distribution.unwrap_or("Unavailable".to_owned()), true)
+         .field("Prereqs", c.prerequisites.unwrap_or("Unavailable".to_owned()), true)
+         .field("Coreqs", c.corequisites.unwrap_or("Unavailable".to_owned()), true)
+         .field("Exclusions", c.exclusions.unwrap_or("Unavailable".to_owned()), true)
+         .field("Description", c.description.unwrap_or("Unavailable".to_owned()), false);
     })
 }
 
@@ -134,10 +134,10 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
 fn textbooks(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Textbook>(&ctx, msg, client.textbooks(to_params(&msg.content_safe(&ctx))), |t: Textbook, m: &mut CreateEmbed| {
-        m.title(t.title.as_ref().unwrap_or(&"Textbook".to_owned()))
-         .field("Price", format!("${}", t.price.as_ref().unwrap_or(&-1.0)), true)
-         .field("ISBN", t.isbn.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Courses", t.courses.iter().map(|c| c.code.as_ref().unwrap_or(&"Unavailable".to_owned()).to_owned()).collect::<Vec<_>>().join("\n"), false);
+        m.title(t.title.unwrap_or("Textbook".to_owned()))
+         .field("Price", format!("${}", t.price.unwrap_or(-1.0)), true)
+         .field("ISBN", t.isbn.unwrap_or("Unavailable".to_owned()), true)
+         .field("Courses", t.courses.into_iter().map(|c| c.code.unwrap_or("Unavailable".to_owned()).to_owned()).collect::<Vec<_>>().join("\n"), false);
     })
 }
 
@@ -146,11 +146,11 @@ fn exams(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Exam>(&ctx, msg, client.exams(to_params(&msg.content_safe(&ctx))), |e: Exam, m: &mut CreateEmbed| {
         m.title("Exam")
-         .field("Course", e.course_code.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Campus", e.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Date", e.date.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Start", e.start.as_ref().unwrap_or(&0), true)
-         .field("End", e.end.as_ref().unwrap_or(&0), true);
+         .field("Course", e.course_code.unwrap_or("Unavailable".to_owned()), true)
+         .field("Campus", e.campus.unwrap_or("Unavailable".to_owned()), true)
+         .field("Date", e.date.unwrap_or("Unavailable".to_owned()), true)
+         .field("Start", e.start.unwrap_or(0), true)
+         .field("End", e.end.unwrap_or(0), true);
     })
 }
 
@@ -159,9 +159,9 @@ fn evals(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Eval>(&ctx, msg, client.evals(to_params(&msg.content_safe(&ctx))), |e: Eval, m: &mut CreateEmbed| {
         m.title("Eval")
-         .field("Name", e.name.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Campus", e.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Last Updated", e.last_updated.as_ref().unwrap_or(&"Unavailable".to_owned()), true);
+         .field("Name", e.name.unwrap_or("Unavailable".to_owned()), true)
+         .field("Campus", e.campus.unwrap_or("Unavailable".to_owned()), true)
+         .field("Last Updated", e.last_updated.unwrap_or("Unavailable".to_owned()), true);
     })
 }
 
@@ -169,12 +169,12 @@ fn evals(ctx: &mut Context, msg: &Message) -> CommandResult {
 fn food(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Food>(&ctx, msg, client.food(to_params(&msg.content_safe(&ctx))), |f: Food, m: &mut CreateEmbed| {
-        m.title(f.name.as_ref().unwrap_or(&"Food".to_owned()))
-         .field("Campus", f.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Address", f.address.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Tags", f.tags.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("URL", f.url.as_ref().unwrap_or(&"Unavailable".to_owned()), true);
-         match f.image.as_ref() {
+        m.title(f.name.unwrap_or("Food".to_owned()))
+         .field("Campus", f.campus.unwrap_or("Unavailable".to_owned()), true)
+         .field("Address", f.address.unwrap_or("Unavailable".to_owned()), true)
+         .field("Tags", f.tags.unwrap_or("Unavailable".to_owned()), true)
+         .field("URL", f.url.unwrap_or("Unavailable".to_owned()), true);
+         match f.image {
              Some(url) => { m.image(url); },
              _ => {}
          }
@@ -186,11 +186,11 @@ fn services(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Service>(&ctx, msg, client.services(to_params(&msg.content_safe(&ctx))), |s: Service, m: &mut CreateEmbed| {
         m.title("Service")
-         .field("Name", s.name.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Campus", s.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("tags", s.tags.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Building", s.building_id.as_ref().unwrap_or(&"Unavailable".to_owned()), true);
-         match s.image.as_ref() {
+         .field("Name", s.name.unwrap_or("Unavailable".to_owned()), true)
+         .field("Campus", s.campus.unwrap_or("Unavailable".to_owned()), true)
+         .field("tags", s.tags.unwrap_or("Unavailable".to_owned()), true)
+         .field("Building", s.building_id.unwrap_or("Unavailable".to_owned()), true);
+         match s.image {
              Some(url) => { m.image(url); },
              _ => {}
          }
@@ -201,9 +201,9 @@ fn services(ctx: &mut Context, msg: &Message) -> CommandResult {
 fn buildings(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Building>(&ctx, msg, client.buildings(to_params(&msg.content_safe(&ctx))), |b: Building, m: &mut CreateEmbed| {
-        m.title(b.name.as_ref().unwrap_or(&"Building".to_owned()))
-         .field("Address", format!("{},{},{}", b.address.street.as_ref().unwrap_or(&"?".to_owned()), b.address.city.as_ref().unwrap_or(&"?".to_owned()), b.address.country.as_ref().unwrap_or(&"?".to_owned())), true)
-         .field("Coordinates", format!("{} degrees North, {} degrees East", b.coordinates.latitude.as_ref().unwrap_or(&0.0), b.coordinates.longitude.as_ref().unwrap_or(&0.0)), true);
+        m.title(b.name.unwrap_or("Building".to_owned()))
+         .field("Address", format!("{},{},{}", b.address.street.unwrap_or("?".to_owned()), b.address.city.unwrap_or("?".to_owned()), b.address.country.unwrap_or("?".to_owned())), true)
+         .field("Coordinates", format!("{} degrees North, {} degrees East", b.coordinates.latitude.unwrap_or(0.0), b.coordinates.longitude.unwrap_or(0.0)), true);
     })
 }
 
@@ -212,10 +212,10 @@ fn parking(ctx: &mut Context, msg: &Message) -> CommandResult {
     let client = NikelAPI::new();
     req::<Parking>(&ctx, msg, client.parking(to_params(&msg.content_safe(&ctx))), |p: Parking, m: &mut CreateEmbed| {
         m.title("Parking")
-         .field("Name", p.name.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Campus", p.campus.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Address", p.address.as_ref().unwrap_or(&"Unavailable".to_owned()), true)
-         .field("Tags", p.description.as_ref().unwrap_or(&"Unavailable".to_owned()), false);
+         .field("Name", p.name.unwrap_or("Unavailable".to_owned()), true)
+         .field("Campus", p.campus.unwrap_or("Unavailable".to_owned()), true)
+         .field("Address", p.address.unwrap_or("Unavailable".to_owned()), true)
+         .field("Tags", p.description.unwrap_or("Unavailable".to_owned()), false);
     })
 }
 
