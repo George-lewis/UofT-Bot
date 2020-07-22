@@ -25,7 +25,7 @@ mod config;
 mod util;
 
 const AC_COURSES: &str = "https://fas.calendar.utoronto.ca/course";
-const INVITE_URL: &str = format!("https://discord.com/api/oauth2/authorize?client_id={}&scope=bot&permissions${}", "726858679550476289", "0");
+const INVITE_URL: &str = "https://discord.com/api/oauth2/authorize?client_id=726858679550476289&scope=bot&permissions=0";
 
 #[group]
 #[commands(courses, textbooks, exams, evals, food, food, services, buildings, parking)]
