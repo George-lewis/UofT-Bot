@@ -100,7 +100,8 @@ fn help(
 fn invite(ctx: &mut Context, msg: &Message) -> CommandResult {
     msg.channel_id.send_message(ctx, |m| {
         m.embed(|e: &mut serenity::builder::CreateEmbed| {
-            e.colour((200, 100, 100)).title("Invite").url(INVITE_URL)
+            // e.colour((200, 100, 100)).title("Invite").url(INVITE_URL)
+            e.colour((255, 0, 0)).title("no").description("Not yet")
         })
     })?;
     Ok(())
