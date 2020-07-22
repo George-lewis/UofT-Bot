@@ -4,12 +4,19 @@ use serenity::model::prelude::*;
 use serenity::framework::standard::{
     StandardFramework,
     CommandResult,
+    Args,
+    HelpOptions,
+    CommandGroup,
+    help_commands,
     macros::{
         command,
-        group
+        group,
+        help
     }
 };
 use serenity::builder::*;
+
+use std::collections::HashSet;
 
 use colored::*;
 
@@ -63,13 +70,26 @@ fn main() {
         .expect(&"Error creating client".red());
     client.with_framework(StandardFramework::new()
         .configure(|c| c.prefix(".")) // set the bot's prefix to "~"
-        .group(&GENERAL_GROUP));
+        .group(&GENERAL_GROUP)
+        .help(&HELP));
 
     // start listening for events by starting a single shard
     if let Err(why) = client.start() {
         println!("{}{:?}", "An error occurred while running the client: ".red(), why);
     }
 }
+
+#[help]
+fn help(
+    context: &mut Context,
+    msg: &Message,
+    args: Args,
+    help_options: &'static HelpOptions,
+    groups: &[&'static CommandGroup],
+    owners: HashSet<UserId>
+ ) -> CommandResult {
+    help_commands::with_embeds(context, msg, args, help_options, groups, owners)
+ }
 
 type NikelFunc<T> = fn(Parameters) -> NikelResult<T>;
 
