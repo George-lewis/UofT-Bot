@@ -25,9 +25,14 @@ mod config;
 mod util;
 
 const AC_COURSES: &str = "https://fas.calendar.utoronto.ca/course";
+const INVITE_URL: &str = format!("https://discord.com/api/oauth2/authorize?client_id={}&scope=bot&permissions${}", "726858679550476289", "0");
 
 #[group]
 #[commands(courses, textbooks, exams, evals, food, food, services, buildings, parking)]
+struct UofT;
+
+#[group]
+#[commands(invite)]
 struct General;
 
 struct Handler;
@@ -66,6 +71,7 @@ fn main() {
         .expect(&"Error creating client".red());
     client.with_framework(StandardFramework::new()
         .configure(|c| c.prefix(".")) // set the bot's prefix to "~"
+        .group(&UOFT_GROUP)
         .group(&GENERAL_GROUP)
         .help(&HELP));
 
@@ -89,6 +95,16 @@ fn help(
  ) -> CommandResult {
     help_commands::with_embeds(context, msg, args, help_options, groups, owners)
  }
+
+#[command]
+fn invite(ctx: &mut Context, msg: &Message) -> CommandResult {
+    msg.channel_id.send_message(ctx, |m| {
+        m.embed(|e: &mut serenity::builder::CreateEmbed| {
+            e.colour((200, 100, 100)).title("Invite").url(INVITE_URL)
+        })
+    })?;
+    Ok(())
+}
 
 type NikelFunc<T> = fn(Parameters) -> NikelResult<T>;
 
@@ -129,7 +145,7 @@ fn req<T: Clone>(ctx: &Context, msg: &Message, f: NikelFunc<T>, default: &str, p
             }
         }
     })?;
-    Ok(()) as CommandResult
+    Ok(())
 }
 
 #[command]
