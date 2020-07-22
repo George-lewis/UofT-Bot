@@ -132,7 +132,7 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
          .field("Coreqs", c.corequisites.unwrap_or("Unavailable".to_owned()), true)
          .field("Exclusions", c.exclusions.unwrap_or("Unavailable".to_owned()), true)
          .field("Description", c.description.unwrap_or("Unavailable".to_owned()), false)
-         .url(format!("{}{}", AC_COURSES, code));
+         .url(format!("{}/{}", AC_COURSES, code));
     })
 }
 
