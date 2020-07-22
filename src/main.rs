@@ -8,11 +8,7 @@ use serenity::framework::standard::{
     HelpOptions,
     CommandGroup,
     help_commands,
-    macros::{
-        command,
-        group,
-        help
-    }
+    macros::*
 };
 use serenity::builder::*;
 
@@ -80,6 +76,8 @@ fn main() {
 }
 
 #[help]
+#[strikethrough_commands_tip_in_guild("")]
+#[embed_success_colour(DARK_BLUE)]
 fn help(
     context: &mut Context,
     msg: &Message,
