@@ -77,6 +77,7 @@ fn main() {
 
 #[help]
 #[strikethrough_commands_tip_in_guild("")]
+#[strikethrough_commands_tip_in_dm("")]
 #[embed_success_colour(DARK_BLUE)]
 fn help(
     context: &mut Context,
@@ -261,7 +262,7 @@ fn parking(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 fn to_params<'a>(input: &'a String, default: &'a String) -> Result<Parameters<'a>, ()> {
     
-    let (_, rest) = match split_once(input, ' ') {
+    let (_, rest) = match split_command(input, ' ') {
         Ok((a, b)) => (a, b),
         _ => return Err(())
     };
@@ -287,7 +288,7 @@ fn to_params<'a>(input: &'a String, default: &'a String) -> Result<Parameters<'a
 
 }
 
-fn split_once(in_string: &str, delim: char) -> Result<(&str, &str), ()> {
+fn split_command(in_string: &str, delim: char) -> Result<(&str, &str), ()> {
     let mut splitter = in_string.splitn(2, delim);
     let first = match splitter.next() {
         Some(s) => s,
