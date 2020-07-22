@@ -19,8 +19,12 @@ use nikel_rs::*;
 
 mod config;
 
+mod util;
+
+const AC_COURSES: &str = "https://fas.calendar.utoronto.ca/course";
+
 #[group]
-#[commands(ping, echo, courses, textbooks, exams, evals, food, food, services, buildings, parking)]
+#[commands(courses, textbooks, exams, evals, food, food, services, buildings, parking)]
 struct General;
 
 struct Handler;
@@ -65,20 +69,6 @@ fn main() {
     if let Err(why) = client.start() {
         println!("{}{:?}", "An error occurred while running the client: ".red(), why);
     }
-}
-
-#[command]
-fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
-    msg.reply(&ctx, "Pong!")?;
-
-    return Ok(());
-}
-
-#[command]
-fn echo(ctx: &mut Context, msg: &Message) -> CommandResult {
-    msg.reply(&ctx, msg.content_safe(&ctx).replace(".echo ", ""))?;
-
-    return Ok(());
 }
 
 type NikelFunc<T> = fn(Parameters) -> NikelResult<T>;
@@ -127,10 +117,11 @@ fn req<T: Clone>(ctx: &Context, msg: &Message, f: NikelFunc<T>, default: &str, p
 #[aliases("course", "classes", "class")]
 fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
     req::<Course>(&ctx, msg, nikel_rs::courses, "code", |c: Course, m: &mut CreateEmbed| {
-        let title = format!("{}{}", c.code.expect("No course code!?"),
+        let code = c.code.expect("No course code!?");
+        let title = format!("{}{}", code,
             match c.name {
                 Some(name) => format!(" - {}", name),
-                _ => "".to_owned()
+                _ => "Course".to_owned()
             }
         );
         m.title(title)
@@ -140,7 +131,8 @@ fn courses(ctx: &mut Context, msg: &Message) -> CommandResult {
          .field("Prereqs", c.prerequisites.unwrap_or("Unavailable".to_owned()), true)
          .field("Coreqs", c.corequisites.unwrap_or("Unavailable".to_owned()), true)
          .field("Exclusions", c.exclusions.unwrap_or("Unavailable".to_owned()), true)
-         .field("Description", c.description.unwrap_or("Unavailable".to_owned()), false);
+         .field("Description", c.description.unwrap_or("Unavailable".to_owned()), false)
+         .url(format!("{}{}", AC_COURSES, code));
     })
 }
 
@@ -152,19 +144,34 @@ fn textbooks(ctx: &mut Context, msg: &Message) -> CommandResult {
          .field("Price", format!("${}", t.price.unwrap_or(-1.0)), true)
          .field("ISBN", t.isbn.unwrap_or("Unavailable".to_owned()), true)
          .field("Courses", t.courses.into_iter().map(|c| c.code.unwrap_or("Unavailable".to_owned()).to_owned()).collect::<Vec<_>>().join("\n"), false);
+         match t.image {
+            Some(url) => {
+                m.image(url);
+            },
+            _ => {}
+         }
+         
     })
 }
 
 #[command]
 #[aliases("exam")]
 fn exams(ctx: &mut Context, msg: &Message) -> CommandResult {
-    req::<Exam>(&ctx, msg, nikel_rs::exams, "course", |e: Exam, m: &mut CreateEmbed| {
+    req::<Exam>(&ctx, msg, nikel_rs::exams, "course_code", |e: Exam, m: &mut CreateEmbed| {
         m.title("Exam")
          .field("Course", e.course_code.unwrap_or("Unavailable".to_owned()), true)
          .field("Campus", e.campus.unwrap_or("Unavailable".to_owned()), true)
-         .field("Date", e.date.unwrap_or("Unavailable".to_owned()), true)
-         .field("Start", e.start.unwrap_or(0), true)
-         .field("End", e.end.unwrap_or(0), true);
+         .field("Date", e.date.unwrap_or("Unavailable".to_owned()), true);
+         match e.start {
+             Some(time) =>{
+                 m.field("Start", util::convert_time(time), true);
+             }, _ => {}
+         };
+         match e.end {
+            Some(time) =>{
+                m.field("End", util::convert_time(time), true);
+            }, _ => {}
+        };
     })
 }
 
@@ -185,8 +192,11 @@ fn food(ctx: &mut Context, msg: &Message) -> CommandResult {
         m.title(f.name.unwrap_or("Food".to_owned()))
          .field("Campus", f.campus.unwrap_or("Unavailable".to_owned()), true)
          .field("Address", f.address.unwrap_or("Unavailable".to_owned()), true)
-         .field("Tags", f.tags.unwrap_or("Unavailable".to_owned()), true)
-         .field("URL", f.url.unwrap_or("Unavailable".to_owned()), true);
+         .field("Tags", f.tags.unwrap_or("Unavailable".to_owned()), true);
+         match f.url {
+             Some(url) => { m.url(url); },
+             _ => {}
+         }
          match f.image {
              Some(url) => { m.image(url); },
              _ => {}
