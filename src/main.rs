@@ -24,11 +24,11 @@ mod config;
 
 mod util;
 
-const AC_COURSES: &str = "https://fas.calendar.utoronto.ca/course";
+const AC_COURSES: &str = "https://coursefinder.utoronto.ca/course-search/search/courseSearch/coursedetails";
 const INVITE_URL: &str = "https://discord.com/api/oauth2/authorize?client_id=726858679550476289&scope=bot&permissions=0";
 
 #[group]
-#[commands(courses, textbooks, exams, evals, food, food, services, buildings, parking)]
+#[commands(courses, textbooks, exams, evals, food, food, services, buildings, parking, programs)]
 struct UofT;
 
 #[group]
@@ -274,6 +274,19 @@ fn parking(ctx: &mut Context, msg: &Message) -> CommandResult {
          .field("Campus", p.campus.unwrap_or("Unavailable".to_owned()), true)
          .field("Address", p.address.unwrap_or("Unavailable".to_owned()), true)
          .field("Tags", p.description.unwrap_or("Unavailable".to_owned()), false);
+    })
+}
+
+#[command]
+#[aliases("program")]
+fn programs(ctx: &mut Context, msg: &Message) -> CommandResult {
+    req::<Program>(&ctx, msg, nikel_rs::program, "name", |p: Program, m: &mut CreateEmbed| {
+        m.title(p.name.unwrap_or("Program".to_owned()))
+         .field("Type", p.type_field.unwrap_or("Unavailable".to_owned()), true)
+         .field("Campus", p.campus.unwrap_or("Unavailable".to_owned()), true)
+         .field("Description", p.description.unwrap_or("Unavailable".to_owned()).truncate(1024), false)
+         .field("Enrollment Requirements", p.enrollment.unwrap_or("Unavailable".to_owned()).truncate(1024), false)
+         .field("Completion Requirements", p.completion.unwrap_or("Unavailable".to_owned()).truncate(1024), false);
     })
 }
 
