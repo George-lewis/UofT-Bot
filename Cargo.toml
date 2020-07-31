@@ -1,13 +1,13 @@
 [package]
 name = "uoft-bot"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["George-Lewis <georgejeffreylewis@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-nikel-rs = "0.2.1"
+nikel-rs = "0.2.2"
 colored = "1.9"
 serenity = "0.8"
 chrono = "0.4"
