@@ -694,9 +694,9 @@ dependencies = [
 
 [[package]]
 name = "nikel-rs"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a8b3e890174011414916ded0ccbf085934713565ecb30c620a9510abc380087"
+checksum = "73186e0285edf1b8b4af272a18067001cb316f3c3958f50f4e2233aa2aea3554"
 dependencies = [
  "reqwest",
  "serde",
@@ -1431,7 +1431,7 @@ checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 
 [[package]]
 name = "uoft-bot"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "chrono",
  "colored",
