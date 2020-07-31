@@ -10,6 +10,8 @@ use serenity::framework::standard::{
     help_commands,
     macros::*
 };
+
+use serenity::utils::Colour;
 use serenity::builder::*;
 
 use std::collections::HashSet;
@@ -24,8 +26,17 @@ mod config;
 
 mod util;
 
-const AC_COURSES: &str = "https://coursefinder.utoronto.ca/course-search/search/courseSearch/coursedetails";
-const INVITE_URL: &str = "https://discord.com/api/oauth2/authorize?client_id=726858679550476289&scope=bot&permissions=0";
+const AC_COURSES: &'static str = "https://coursefinder.utoronto.ca/course-search/search/courseSearch/coursedetails";
+const INVITE_URL: &'static str = "https://discord.com/api/oauth2/authorize?client_id=726858679550476289&scope=bot&permissions=0";
+
+const CREATOR: &'static str = "bolt#8452";
+
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
+const EMBED_BLUE: &'static Colour = &Colour::from_rgb(0, 46, 100);
+const EMBED_YELLOW: &'static Colour = &Colour::from_rgb(242, 170, 0);
+const EMBED_FAIL: &'static Colour = &Colour::from_rgb(200, 100, 100);
+
 
 #[group]
 #[commands(courses, textbooks, exams, evals, food, food, services, buildings, parking, programs)]
@@ -101,7 +112,7 @@ fn invite(ctx: &mut Context, msg: &Message) -> CommandResult {
     msg.channel_id.send_message(ctx, |m| {
         m.embed(|e: &mut serenity::builder::CreateEmbed| {
             // e.colour((200, 100, 100)).title("Invite").url(INVITE_URL)
-            e.colour((255, 0, 0)).title("no").description("Not yet")
+            e.colour(*EMBED_FAIL).title("no").description("Not yet")
         })
     })?;
     Ok(())
@@ -120,7 +131,7 @@ fn req<T: Clone>(ctx: &Context, msg: &Message, f: NikelFunc<T>, default: &str, p
             Ok(p) => p,
             _ => {
                 return m.embed(|e: &mut serenity::builder::CreateEmbed| {
-                    e.colour((200, 100, 100)).title("Failed").description("Couldn't parse input")
+                    e.colour(*EMBED_FAIL).title("Failed").description("Couldn't parse input")
                 })
             }
         };
@@ -129,11 +140,11 @@ fn req<T: Clone>(ctx: &Context, msg: &Message, f: NikelFunc<T>, default: &str, p
             Ok(resp) => {
                 if resp.response.len() == 0 {
                     m.embed(|e: &mut serenity::builder::CreateEmbed| {
-                        e.colour((242, 170, 0)).title("No Results").description("No results were returned by the API")
+                        e.colour(*EMBED_YELLOW).title("No Results").description("No results were returned by the API")
                     })
                 } else {
                     m.embed(|e: &mut serenity::builder::CreateEmbed| {
-                        e.color((0, 46, 100));
+                        e.color(*EMBED_BLUE);
                         proc(resp.response[0].clone(), e);
                         e
                     })
@@ -141,7 +152,7 @@ fn req<T: Clone>(ctx: &Context, msg: &Message, f: NikelFunc<T>, default: &str, p
             },
             _ => {
                 m.embed(|e: &mut serenity::builder::CreateEmbed| {
-                    e.colour((200, 100, 100)).title("Failed").description("There was a problem with that")
+                    e.colour(*EMBED_FAIL).title("Failed").description("There was a problem with that")
                 })
             }
         }
