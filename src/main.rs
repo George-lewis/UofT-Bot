@@ -284,9 +284,21 @@ fn programs(ctx: &mut Context, msg: &Message) -> CommandResult {
         m.title(p.name.unwrap_or("Program".to_owned()))
          .field("Type", p.type_field.unwrap_or("Unavailable".to_owned()), true)
          .field("Campus", p.campus.unwrap_or("Unavailable".to_owned()), true)
-         .field("Description", p.description.unwrap_or("Unavailable".to_owned()), false)
-         .field("Enrollment Requirements", p.enrollment.unwrap_or("Unavailable".to_owned()), false)
-         .field("Completion Requirements", p.completion.unwrap_or("Unavailable".to_owned()), false);
+         .field("Description", {
+             let mut description = p.description.unwrap_or("Unavailable".to_owned());
+             description.truncate(1024);
+             description
+         }, false)
+         .field("Enrollment Requirements", {
+             let mut enrollment = p.enrollment.unwrap_or("Unavailable".to_owned());
+             enrollment.truncate(1024);
+             enrollment
+         }, false)
+         .field("Completion Requirements", {
+             let mut completion = p.completion.unwrap_or("Unavailable".to_owned());
+             completion.truncate(1024);
+             completion
+         }, false);
     })
 }
 
