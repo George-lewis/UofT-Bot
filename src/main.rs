@@ -43,7 +43,7 @@ const EMBED_FAIL: &'static Colour = &Colour::from_rgb(200, 100, 100);
 struct UofT;
 
 #[group]
-#[commands(invite)]
+#[commands(invite, info)]
 struct General;
 
 struct Handler;
@@ -113,6 +113,19 @@ fn invite(ctx: &mut Context, msg: &Message) -> CommandResult {
         m.embed(|e: &mut serenity::builder::CreateEmbed| {
             // e.colour((200, 100, 100)).title("Invite").url(INVITE_URL)
             e.colour(*EMBED_FAIL).title("no").description("Not yet")
+        })
+    })?;
+    Ok(())
+}
+
+#[command]
+fn info(ctx: &mut Context, msg: &Message) -> CommandResult {
+    msg.channel_id.send_message(ctx, |m| {
+        m.embed(|e: &mut serenity::builder::CreateEmbed| {
+            e.colour(*EMBED_BLUE).title("UofT Bot")
+             .description("A bot for accessing UofT data")
+             .field("Creator", CREATOR, true)
+             .field("Version", VERSION, true)
         })
     })?;
     Ok(())
