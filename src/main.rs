@@ -280,13 +280,13 @@ fn parking(ctx: &mut Context, msg: &Message) -> CommandResult {
 #[command]
 #[aliases("program")]
 fn programs(ctx: &mut Context, msg: &Message) -> CommandResult {
-    req::<Program>(&ctx, msg, nikel_rs::program, "name", |p: Program, m: &mut CreateEmbed| {
+    req::<Program>(&ctx, msg, nikel_rs::programs, "name", |p: Program, m: &mut CreateEmbed| {
         m.title(p.name.unwrap_or("Program".to_owned()))
          .field("Type", p.type_field.unwrap_or("Unavailable".to_owned()), true)
          .field("Campus", p.campus.unwrap_or("Unavailable".to_owned()), true)
-         .field("Description", p.description.unwrap_or("Unavailable".to_owned()).truncate(1024), false)
-         .field("Enrollment Requirements", p.enrollment.unwrap_or("Unavailable".to_owned()).truncate(1024), false)
-         .field("Completion Requirements", p.completion.unwrap_or("Unavailable".to_owned()).truncate(1024), false);
+         .field("Description", p.description.unwrap_or("Unavailable".to_owned()), false)
+         .field("Enrollment Requirements", p.enrollment.unwrap_or("Unavailable".to_owned()), false)
+         .field("Completion Requirements", p.completion.unwrap_or("Unavailable".to_owned()), false);
     })
 }
 
